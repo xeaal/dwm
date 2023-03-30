@@ -1,34 +1,28 @@
 --- dwm.c
 +++ dwm.c
-@@ -1595,19 +1671,25 @@ setlayout(const Arg *arg)
- }
+@@ -58,7 +58,7 @@
+ #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
  
- void
--setcfact(const Arg *arg) {
-+setcfact(const Arg *arg)
-+{
- 	float f;
- 	Client *c;
- 
- 	c = selmon->sel;
- 
--	if(!arg || !c || !selmon->lt[selmon->sellt]->arrange)
-+	if (!arg || !c || !selmon->lt[selmon->sellt]->arrange)
- 		return;
--	f = arg->f + c->cfact;
--	if(arg->f == 0.0)
-+	if (!arg->f)
- 		f = 1.0;
--	else if(f < 0.25 || f > 4.0)
--		return;
-+	else if (arg->f > 4.0) // set fact absolutely
-+		f = arg->f - 4.0;
-+	else
-+		f = arg->f + c->cfact;
-+	if (f < 0.25)
-+		f = 0.25;
-+	else if (f > 4.0)
-+		f = 4.0;
- 	c->cfact = f;
- 	arrange(selmon);
- }
+ /* enums */
+-enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
++enum { CurNormal, CurResize, CurMove, CurResizeHorzArrow, CurResizeVertArrow, CurLast }; /* cursor */
+ enum { SchemeNorm, SchemeSel }; /* color schemes */
+ enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
+        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
+@@ -161,6 +161,7 @@ static void destroynotify(XEvent *e);
+ static void detach(Client *c);
+ static void detachstack(Client *c);
+ static Monitor *dirtomon(int dir);
++static void dragmfact(const Arg *arg);
+ static void drawbar(Monitor *m);
+ static void drawbars(void);
+ static void enternotify(XEvent *e);
+@@ -1793,6 +2017,8 @@ setup(void)
+ 	cursor[CurNormal] = drw_cur_create(drw, XC_left_ptr);
+ 	cursor[CurResize] = drw_cur_create(drw, XC_sizing);
+ 	cursor[CurMove] = drw_cur_create(drw, XC_fleur);
++	cursor[CurResizeHorzArrow] = drw_cur_create(drw, XC_sb_h_double_arrow);
++	cursor[CurResizeVertArrow] = drw_cur_create(drw, XC_sb_v_double_arrow);
+ 	/* init appearance */
+ 	scheme = ecalloc(LENGTH(colors), sizeof(Clr *));
+ 	for (i = 0; i < LENGTH(colors); i++)
