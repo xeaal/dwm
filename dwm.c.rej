@@ -1,28 +1,16 @@
 --- dwm.c
 +++ dwm.c
-@@ -58,7 +58,7 @@
- #define TEXTW(X)                (drw_fontset_getwidth(drw, (X)) + lrpad)
- 
- /* enums */
--enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
-+enum { CurNormal, CurResize, CurMove, CurResizeHorzArrow, CurResizeVertArrow, CurLast }; /* cursor */
- enum { SchemeNorm, SchemeSel }; /* color schemes */
- enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
-        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
-@@ -161,6 +161,7 @@ static void destroynotify(XEvent *e);
- static void detach(Client *c);
- static void detachstack(Client *c);
- static Monitor *dirtomon(int dir);
-+static void dragmfact(const Arg *arg);
- static void drawbar(Monitor *m);
- static void drawbars(void);
- static void enternotify(XEvent *e);
-@@ -1793,6 +2017,8 @@ setup(void)
- 	cursor[CurNormal] = drw_cur_create(drw, XC_left_ptr);
- 	cursor[CurResize] = drw_cur_create(drw, XC_sizing);
- 	cursor[CurMove] = drw_cur_create(drw, XC_fleur);
-+	cursor[CurResizeHorzArrow] = drw_cur_create(drw, XC_sb_h_double_arrow);
-+	cursor[CurResizeVertArrow] = drw_cur_create(drw, XC_sb_v_double_arrow);
- 	/* init appearance */
- 	scheme = ecalloc(LENGTH(colors), sizeof(Clr *));
- 	for (i = 0; i < LENGTH(colors); i++)
+@@ -187,10 +190,13 @@ static void maprequest(XEvent *e);
+ static void monocle(Monitor *m);
+ static void motionnotify(XEvent *e);
+ static void movemouse(const Arg *arg);
++static void moveorplace(const Arg *arg);
+ static Client *nexttiled(Client *c);
++static void placemouse(const Arg *arg);
+ static void pop(Client *);
+ static void propertynotify(XEvent *e);
+ static void quit(const Arg *arg);
++static Client *recttoclient(int x, int y, int w, int h);
+ static Monitor *recttomon(int x, int y, int w, int h);
+ static void resize(Client *c, int x, int y, int w, int h, int interact);
+ static void resizeclient(Client *c, int x, int y, int w, int h);
